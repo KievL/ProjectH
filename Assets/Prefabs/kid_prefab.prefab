@@ -266,7 +266,7 @@ MonoBehaviour:
   - {x: -0.28783935, y: -0.114191055, z: 0}
   m_ShapePathHash: -318107559
   m_Mesh: {fileID: 0}
-  m_InstanceId: 22430
+  m_InstanceId: 36558
 --- !u!114 &348063259699359747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,6 +280,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
+  isDead: 0
+  saved: 0
 --- !u!50 &3972187357662663186
 Rigidbody2D:
   serializedVersion: 4
@@ -447,7 +449,7 @@ GameObject:
   - component: {fileID: 6885069108246298835}
   m_Layer: 0
   m_Name: body
-  m_TagString: Untagged
+  m_TagString: KidBody
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

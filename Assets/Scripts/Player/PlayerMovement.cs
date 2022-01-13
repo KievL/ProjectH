@@ -5,9 +5,10 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public bool toggleMove = false;
-    bool sprintAvailable = true;
+    public bool sprintAvailable = true;
 
     private GameObject player, cameraScene, demonBehaviour;
+    private Thermometer thermo;
 
     public float speed;
 
@@ -33,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
         losJoystick = GameObject.Find("LOSJoystick").GetComponent<FixedJoystick>();
         demonBehaviour = GameObject.FindGameObjectWithTag("Enemy");
         demonBehaviour.GetComponent<DemonBehaviour>().OnPlayerKilled += DisableMovement;
+        thermo = GameObject.FindGameObjectWithTag("Thermometer").GetComponent<Thermometer>();
     }
 
     // Update is called once per frame
@@ -117,11 +119,14 @@ public class PlayerMovement : MonoBehaviour
 
     public void Sprint()
     {
-        if (sprintAvailable)
+        if (!thermo.isOpen)
         {
-            speed *= 2;
-            sprintAvailable = false;
-            Invoke("StopSprint", 4f);
+            if (sprintAvailable)
+            {
+                speed *= 2;
+                sprintAvailable = false;
+                Invoke("StopSprint", 4f);
+            }
         }
     }
 

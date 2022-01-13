@@ -15,10 +15,15 @@ public class IllusionBehaviour : MonoBehaviour
     [SerializeField] private bool isIllusionActive = false;
 
     private PlayerBehaviour playerBehaviour;
+    private Crucifix crucifix;
 
     private bool isOnSightCollider = false;
     [SerializeField] private float timeBeingSeen = 0;
     [SerializeField] private float timeNotBeingSeen = 0;
+
+    [SerializeField] private float timeBeingCrucifixed;
+    [SerializeField] private bool isBeingSlowed = false;
+    [SerializeField] private bool isNotBeingSlowed = true;
 
     public event Action<int> OnIllusionSeen;
     public event Action OnIllusionNotSeen;
@@ -33,6 +38,7 @@ public class IllusionBehaviour : MonoBehaviour
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
 
         playerBehaviour = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehaviour>();
+        crucifix = GameObject.FindGameObjectWithTag("Player").GetComponent<Crucifix>();
 
         //Se for do tipo 1, ele já começa visível mas inativo
         if (illusionType == 2)
@@ -61,6 +67,8 @@ public class IllusionBehaviour : MonoBehaviour
 
         //por enquanto...
         StartSelfSpontaneousCombustion();
+
+        DieByCrucifix();
     }    
 
     //Faz a illusion olhar sempre para o player
@@ -137,7 +145,7 @@ public class IllusionBehaviour : MonoBehaviour
                 
         if(timeNotBeingSeen >= 2f)
         {
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
         }       
     }
 
@@ -153,6 +161,36 @@ public class IllusionBehaviour : MonoBehaviour
                 this.GetComponent<NavMeshAgent>().SetDestination(playerBehaviour.transform.position);
             }
         }                
+    }
+
+    private void DieByCrucifix()
+    {
+        if (crucifix.isUsing && isOnSightCollider)
+        {
+            timeBeingCrucifixed += Time.deltaTime;
+
+            if (!isBeingSlowed)
+            {
+                this.GetComponent<NavMeshAgent>().speed *= 0.1f;
+                isBeingSlowed = true;
+                isNotBeingSlowed = false;
+            }
+
+            if (timeBeingCrucifixed >= 2.5f)
+            {
+                Destroy(this.gameObject);
+            }
+        } else if (!crucifix.isUsing || !isOnSightCollider)
+        {
+            if (!isNotBeingSlowed)
+            {
+                this.GetComponent<NavMeshAgent>().speed *= 10f;
+                isNotBeingSlowed = true;
+            }
+
+            timeBeingCrucifixed = 0f;
+            isBeingSlowed = false;
+        }
     }
 
     //Aumenta a fear do player se estiverem se olhando

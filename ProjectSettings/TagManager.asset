@@ -15,6 +15,9 @@ TagManager:
   - PlayerSight
   - Kid
   - Enemy
+  - Thermometer
+  - Safezone
+  - KidBody
   layers:
   - Default
   - TransparentFX
@@ -27,7 +30,7 @@ TagManager:
   - Demon
   - Player
   - DoorColliders
-  - 
+  - Safezone
   - 
   - 
   - 

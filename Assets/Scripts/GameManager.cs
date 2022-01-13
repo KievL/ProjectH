@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     private DemonBehaviour demonBehaviour;
     private DemonAura demonAura;
     private SpawnNPCManager spawnManager;
+    private Salvation salvation;
 
     GameObject[] doors;
 
@@ -35,6 +36,10 @@ public class GameManager : MonoBehaviour
         playerBehaviour = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehaviour>();
         demonBehaviour = GameObject.Find("Demon").GetComponent<DemonBehaviour>();
         spawnManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<SpawnNPCManager>();
+        salvation = FindObjectOfType<Salvation>();
+
+        //events
+        salvation.OnKidSaved += UpdateKidsSaved;
 
         //Pegando o total de kids que iniciaram na partida
         kidsRemaining = spawnManager.kidsQuantity;
@@ -48,6 +53,7 @@ public class GameManager : MonoBehaviour
         }
 
         lastPlayerInteraction = playerBehaviour.currentInteractionPlace;
+
     }
     
     void Update()
@@ -118,4 +124,9 @@ public class GameManager : MonoBehaviour
 
         }        
     }    
+
+    private void UpdateKidsSaved(int _id)
+    {
+        kidsRemaining--;
+    }
 }

@@ -13,6 +13,7 @@ public class PlayerBehaviour : MonoBehaviour
     private GameObject closestDoor;
     private GameObject interactDoorBtn;
     private DemonBehaviour demonBehaviour;
+    private Salvation salvation;
 
     private GameObject closestKid;
     private GameObject commandKidsBtn;
@@ -29,6 +30,7 @@ public class PlayerBehaviour : MonoBehaviour
         closestDoor = null;
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         demonBehaviour = GameObject.Find("Demon").GetComponent<DemonBehaviour>();
+        salvation = FindObjectOfType<Salvation>();
 
         playerCamera = GameObject.FindGameObjectWithTag("MainCamera");
         currentInteractionPlace = playerCamera.transform.position;
@@ -47,6 +49,8 @@ public class PlayerBehaviour : MonoBehaviour
         demonBehaviour.OnHuntIsOver += FearRelief;
         demonBehaviour.OnKidKilled += MakeCommandButtonDisappear;
         demonBehaviour.OnPlayerKilled += DisableButtons;
+
+        salvation.OnKidSaved += SetKidBeingHelpedNull;
 
         kidBeingHelped = null;
     }
@@ -114,8 +118,12 @@ public class PlayerBehaviour : MonoBehaviour
         {
             if (collision.gameObject.name == "kid_collider"&& !playerIsDead)
             {
-                closestKid = collision.gameObject.GetComponentInParent<KidBehaviour>().gameObject;
-                commandKidsBtn.SetActive(true);
+                KidBehaviour kid = collision.GetComponentInParent<KidBehaviour>();
+                if (!kid.saved)
+                {
+                    closestKid = kid.gameObject;
+                    commandKidsBtn.SetActive(true);
+                }                
             }
         }
     }
@@ -189,5 +197,12 @@ public class PlayerBehaviour : MonoBehaviour
         {
             fear = 75f;
         }
+    }
+
+    private void SetKidBeingHelpedNull(int _id)
+    {
+        closestKid = null;
+        kidBeingHelped = null;
+        commandKidsBtn.SetActive(false);
     }
 }

@@ -9,6 +9,7 @@ public class KidBehaviour : MonoBehaviour
     private PlayerBehaviour playerBehaviour;
     private DemonBehaviour demonBehaviour;
     private GameManager gameManager;
+    private Salvation salvation;
 
     NavMeshAgent kidMesh;
     bool isFollowingPlayer = false;
@@ -17,31 +18,74 @@ public class KidBehaviour : MonoBehaviour
 
     public bool isDead = false;
 
+    public bool saved = false;
+
     // Start is called before the first frame update
     void Start()
     {
         playerBehaviour = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehaviour>();
         demonBehaviour = GameObject.Find("Demon").GetComponent<DemonBehaviour>();
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        salvation = FindObjectOfType<Salvation>();
 
         kidMesh = this.GetComponent<NavMeshAgent>();
         kidMesh.stoppingDistance = 3f;
 
         //events
         demonBehaviour.OnKidKilled += Die;
+        salvation.OnKidSaved += SaveKid;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!isFollowingPlayer && !isDead)
+        if (!isDead && !saved)
         {
-            LookToPlayer();
+            
+            if (isFollowingPlayer)
+            {
+
+                InvokeRepeating("KidBodyCollisionWithTheDoors", 0, 0.2f);
+            }
+            else
+            {
+                CancelInvoke("KidBodyCollisionWithTheDoors");
+                LookToPlayer();
+            }
         }
     }
 
     //FAZER UM TRIGGER PARA ABRIR PORTAS
+    //private void OnTriggerStay2D(Collider2D collision)
+    //{
+    //    if(collision.gameObject.TryGetComponent(out DoorBehaviour door) && collision.CompareTag("Door"))
+    //    {
+    //        StartCoroutine(door.interactDoor(false));
+    //    }
+    //}
+
+    //ON INVOKE - Bateu na porta e abriu
+    private void KidBodyCollisionWithTheDoors()
+    {
+        RaycastHit2D[] hits = new RaycastHit2D[3];
+        int cols = Physics2D.CircleCastNonAlloc(this.transform.position, 1f, new Vector3(0, 0, 1), hits, Mathf.Infinity,
+            LayerMask.GetMask("Walls"));
+        if (cols > 0)
+        {
+            foreach(RaycastHit2D hit in hits)
+            {
+                if (hit)
+                {
+                    if (hit.collider.gameObject.TryGetComponent(out DoorBehaviour door))
+                    {
+                        StartCoroutine(door.interactDoor(false));
+                        break;
+                    }
+                }                
+            }
+        }
+    }
 
     private void LookToPlayer()
     {
@@ -54,7 +98,7 @@ public class KidBehaviour : MonoBehaviour
 
     public void ChangeFollowPlayerOrStay()
     {
-        if (!isDead)
+        if (!isDead && !saved)
         {
             isFollowingPlayer = !isFollowingPlayer;
 
@@ -79,11 +123,9 @@ public class KidBehaviour : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log(collisions);
                     float distance = Vector2.Distance(this.transform.position, playerBehaviour.transform.position);
                     if(distance <= 7f)
                     {
-                        Debug.Log(distance);
                         if(!playerBehaviour.GetComponent<Collider2D>().IsTouching(gameManager.createContactFilter("DoorColliders", true))){
                             kidMesh.SetDestination(playerBehaviour.transform.position);                            
                         }
@@ -133,6 +175,16 @@ public class KidBehaviour : MonoBehaviour
             isDead = true;
 
             Debug.Log("kid " + id + " is dead.");
+        }
+    }
+
+    private void SaveKid(int _id)
+    {
+        if (_id == id)
+        {
+            saved = true;
+            isFollowingPlayer = false;
+            //Andar
         }
     }
 }
