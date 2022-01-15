@@ -40,30 +40,22 @@ public class KidBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isDead && !saved)
+        if (!isFollowingPlayer && !isDead)
         {
-            
-            if (isFollowingPlayer)
-            {
+            LookToPlayer();
+        }
 
-                InvokeRepeating("KidBodyCollisionWithTheDoors", 0, 0.2f);
-            }
-            else
+        if (isFollowingPlayer)
+        {
+            float distance = Vector2.Distance(this.transform.position, playerBehaviour.gameObject.transform.position);
+
+            if (distance >= 18f)
             {
-                CancelInvoke("KidBodyCollisionWithTheDoors");
-                LookToPlayer();
+                ChangeFollowPlayerOrStay();
+                playerBehaviour.getSetKidBeingHelpedNull();
             }
         }
     }
-
-    //FAZER UM TRIGGER PARA ABRIR PORTAS
-    //private void OnTriggerStay2D(Collider2D collision)
-    //{
-    //    if(collision.gameObject.TryGetComponent(out DoorBehaviour door) && collision.CompareTag("Door"))
-    //    {
-    //        StartCoroutine(door.interactDoor(false));
-    //    }
-    //}
 
     //ON INVOKE - Bateu na porta e abriu
     private void KidBodyCollisionWithTheDoors()
@@ -103,8 +95,15 @@ public class KidBehaviour : MonoBehaviour
             isFollowingPlayer = !isFollowingPlayer;
 
             if (isFollowingPlayer)
+            {
                 StartCoroutine(setKidDestination());
-        }        
+                InvokeRepeating("KidBodyCollisionWithTheDoors", 0, 5f);
+            } else
+            {
+                CancelInvoke("KidBodyCollisionWithTheDoors");
+            }
+                
+        }
     }
 
     private IEnumerator setKidDestination()
@@ -143,6 +142,7 @@ public class KidBehaviour : MonoBehaviour
             }
             else
             {
+                kidMesh.SetDestination(this.transform.position);
                 break;
             }
         }

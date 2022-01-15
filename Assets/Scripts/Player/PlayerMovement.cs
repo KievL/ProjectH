@@ -9,6 +9,9 @@ public class PlayerMovement : MonoBehaviour
 
     private GameObject player, cameraScene, demonBehaviour;
     private Thermometer thermo;
+    private Crucifix crucifix;
+
+    private bool isCrucifixing = false;
 
     public float speed;
 
@@ -35,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
         demonBehaviour = GameObject.FindGameObjectWithTag("Enemy");
         demonBehaviour.GetComponent<DemonBehaviour>().OnPlayerKilled += DisableMovement;
         thermo = GameObject.FindGameObjectWithTag("Thermometer").GetComponent<Thermometer>();
+        crucifix = GetComponent<Crucifix>();
     }
 
     // Update is called once per frame
@@ -44,6 +48,16 @@ public class PlayerMovement : MonoBehaviour
         MoveCharacterWithKeyboard();
         //LineOfSight();
         LookToMouse();
+
+        if (crucifix.isUsing)
+        {
+            speed = 2f;
+            isCrucifixing = true;
+        } else if (!crucifix.isUsing && isCrucifixing == true)
+        {
+            speed = 3.5f;
+            isCrucifixing = false;
+        }
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -119,11 +133,11 @@ public class PlayerMovement : MonoBehaviour
 
     public void Sprint()
     {
-        if (!thermo.isOpen)
+        if (!thermo.isOpen && !crucifix.isUsing)
         {
             if (sprintAvailable)
             {
-                speed *= 2;
+                speed *= 1.4f;
                 sprintAvailable = false;
                 Invoke("StopSprint", 4f);
             }
@@ -132,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
 
     void StopSprint()
     {
-        speed /= 2;
+        speed /= 1.4f;
         Invoke("EndSprintCooldown", 8f);
     }
 

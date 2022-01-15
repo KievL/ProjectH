@@ -34,6 +34,9 @@ public class DemonBehaviour : MonoBehaviour
 
     [SerializeField] private GameObject jumpScare1;
 
+    private Crucifix crucifix;
+    private bool isOnSightCollider = false;
+    [SerializeField] private bool isBeingSlowed = false;
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +46,7 @@ public class DemonBehaviour : MonoBehaviour
         demonBody = this.GetComponentInChildren<DemonBody>();
         rndWalk = this.GetComponent<RandomWalk>();
         demonMesh = GetComponent<NavMeshAgent>();
+        crucifix = GameObject.FindGameObjectWithTag("Player").GetComponent<Crucifix>();
 
         StartCoroutine(SetVisible(false));
 
@@ -55,6 +59,7 @@ public class DemonBehaviour : MonoBehaviour
     void Update()
     {
         DemonAction();
+        BeCrucifixed();
 
         //Libera o monstro pra caçar depois de 4 segundos
         crono += Time.deltaTime;
@@ -271,5 +276,42 @@ public class DemonBehaviour : MonoBehaviour
         devilIsActing = false;
         
 
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("PlayerSight"))
+        {
+            isOnSightCollider = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("PlayerSight"))
+        {
+            isOnSightCollider = false;
+        }
+    }
+
+    private void BeCrucifixed()
+    {
+        if (crucifix.isUsing && isOnSightCollider)
+        {
+            if (!isBeingSlowed)
+            {
+                this.GetComponent<NavMeshAgent>().speed *= 0.1f;
+                isBeingSlowed = true;
+            }
+        }
+        else if (!crucifix.isUsing || !isOnSightCollider)
+        {
+            if (isBeingSlowed)
+            {
+                this.GetComponent<NavMeshAgent>().speed *= 10f;
+            }
+
+            isBeingSlowed = false;
+        }
     }
 }

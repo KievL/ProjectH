@@ -18,6 +18,7 @@ TagManager:
   - Thermometer
   - Safezone
   - KidBody
+  - Doubledoor
   layers:
   - Default
   - TransparentFX

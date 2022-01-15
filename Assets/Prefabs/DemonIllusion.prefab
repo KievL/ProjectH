@@ -244,7 +244,8 @@ MonoBehaviour:
   illusionType: 0
   isIllusionActive: 0
   timeBeingSeen: 0
-  timeNotBeingSeen: 0
+  timeBeingCrucifixed: 0
+  isBeingSlowed: 0
   goingAfterPlayer: 0
 --- !u!50 &-1359802568585953369
 Rigidbody2D:
@@ -303,7 +304,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.23
-  m_Speed: 3.5
+  m_Speed: 4.5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120

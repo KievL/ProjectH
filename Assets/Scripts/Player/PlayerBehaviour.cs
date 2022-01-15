@@ -73,8 +73,11 @@ public class PlayerBehaviour : MonoBehaviour
     //Abrir a porta e aumentar o Fear
     public void OpenDoor()
     {
-        StartCoroutine(closestDoor.GetComponent<DoorBehaviour>().interactDoor(true));
-        IncreaseFear();
+        if (closestDoor != null)
+        {
+            StartCoroutine(closestDoor.GetComponent<DoorBehaviour>().interactDoor(true));
+            IncreaseFear();
+        }        
     }
     
     //Faz a kid começar a seguir ou parar de seguir
@@ -204,5 +207,10 @@ public class PlayerBehaviour : MonoBehaviour
         closestKid = null;
         kidBeingHelped = null;
         commandKidsBtn.SetActive(false);
+    }
+
+    public void getSetKidBeingHelpedNull()
+    {
+        this.SetKidBeingHelpedNull(999);
     }
 }

@@ -19,14 +19,11 @@ public class IllusionBehaviour : MonoBehaviour
 
     private bool isOnSightCollider = false;
     [SerializeField] private float timeBeingSeen = 0;
-    [SerializeField] private float timeNotBeingSeen = 0;
 
     [SerializeField] private float timeBeingCrucifixed;
     [SerializeField] private bool isBeingSlowed = false;
-    [SerializeField] private bool isNotBeingSlowed = true;
 
     public event Action<int> OnIllusionSeen;
-    public event Action OnIllusionNotSeen;
 
     [SerializeField] private bool goingAfterPlayer = false;
 
@@ -50,10 +47,11 @@ public class IllusionBehaviour : MonoBehaviour
             isIllusionActive = false;
         }
 
-        OnIllusionNotSeen += ProcessToDestroyIllusion;
         OnIllusionSeen += WalkToPlayer;
         OnIllusionSeen += IncreasePlayerFear;
         OnIllusionSeen += DestroyAllOthersIllusons;
+
+        InvokeRepeating("DestroyFarIllusion", 0f, 1f);
     }
 
     // Update is called once per frame
@@ -131,22 +129,20 @@ public class IllusionBehaviour : MonoBehaviour
         {
             OnIllusionSeen(this.GetInstanceID());
         }
-        else
-        {
-            OnIllusionNotSeen();
-        }
         
     }
 
     //Processo de destruição da illusion por muito tempo desativada
-    private void ProcessToDestroyIllusion()
+    private void DestroyFarIllusion()
     {
-        timeNotBeingSeen += Time.deltaTime;
-                
-        if(timeNotBeingSeen >= 2f)
+        Vector2 playerPosition = playerBehaviour.gameObject.transform.position;
+        Vector2 illusionPosition = this.transform.position;
+        float distance = Vector2.Distance(illusionPosition, playerPosition);
+
+        if (distance > 32f && isIllusionActive)
         {
-            //Destroy(this.gameObject);
-        }       
+            Destroy(this.gameObject);
+        }
     }
 
     //Faz a illusion andar até o player
@@ -173,19 +169,17 @@ public class IllusionBehaviour : MonoBehaviour
             {
                 this.GetComponent<NavMeshAgent>().speed *= 0.1f;
                 isBeingSlowed = true;
-                isNotBeingSlowed = false;
             }
 
-            if (timeBeingCrucifixed >= 2.5f)
+            if (timeBeingCrucifixed >= 1.5f)
             {
                 Destroy(this.gameObject);
             }
         } else if (!crucifix.isUsing || !isOnSightCollider)
         {
-            if (!isNotBeingSlowed)
+            if (isBeingSlowed)
             {
                 this.GetComponent<NavMeshAgent>().speed *= 10f;
-                isNotBeingSlowed = true;
             }
 
             timeBeingCrucifixed = 0f;
